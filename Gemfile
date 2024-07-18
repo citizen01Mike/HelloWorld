@@ -48,6 +48,7 @@ group :development, :test do
   gem "rspec-core"
   gem 'rspec-rails', '~> 5.0'
   gem 'rubocop', '~> 1.65'
+  gem 'rails-controller-testing'
 end
 
 group :development do

@@ -4,6 +4,7 @@ services:
     image: postgres:13
     volumes:
       - db_data:/var/lib/postgresql/data
+    command: "postgres -c 'max_connections=500'"
     environment:
       POSTGRES_DB: helloworld_db
       POSTGRES_USER: postgres
@@ -11,7 +12,7 @@ services:
 
   web:
     build: .
-    command: bundle exec rails s -b '0.0.0.0'
+    command: bundle exec rails s -b '127.0.0.1'
     volumes:
       - .:/helloworld
     ports:
@@ -20,6 +21,7 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/helloworld_db
+      POSTGRES_HOST_AUTH_MTHOD: trust
 
 volumes:
   db_data:

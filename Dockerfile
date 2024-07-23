@@ -1,35 +1,25 @@
 # Use the official Ruby image from the Docker Hub
-FROM ruby:2.7
+FROM ruby:2.7.2-alpine
 
 # Install dependencies
-RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 
-# Set an environment variable for the installation path
-ENV INSTALL_PATH /helloworld
+RUN ap add --update \
+    build-base \
+    mariadb-dev \
+    sqlite-dev \
+    nodejs \
+    tzdata \    
+    && rm -rf /var/cache/apk/*
+  RUN gem install bundler
 
-# Create and set work directory
-RUN mkdir -p $INSTALL_PATH
-WORKDIR $INSTALL_PATH
+  WORKDIR /app
 
-# Ensure gems are installed in a specific path
-ENV GEM_HOME="/bundle"
-ENV PATH="/bundle/bin:$PATH"
+  COPY . /app
+  COPY Gemfile Gemfile.lock ./
 
-# Copy Gemfile and Gemfile.lock before other files to utilize Docker cache
-COPY Gemfile Gemfile.lock ./
+  RUN bundle installation
+  
+  EXPOSE 3000
 
-# Install Gem dependencies
-RUN gem install bundler:2.2.14
-RUN bundle install
-
-# Copy the rest of the application code
-COPY . ./
-
-# Precompile assets (if applicable)
-RUN bundle exec rake assets:precompile
-
-# Expose port 3000 to the Docker host
-EXPOSE 3000
-
-# Set the entrypoint to start the server
-CMD ["rails", "server", "-b", "0.0.0.0"]
+  CMD rm -f tmp/pids/server.pid & rails s -b "0.0.0.0"
+  
